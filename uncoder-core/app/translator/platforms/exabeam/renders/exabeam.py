@@ -34,11 +34,13 @@ from app.translator.platforms.exabeam.const import (
     exabeam_analytics_rule_details,
     exabeam_correlation_rule_details,
     exabeam_eql_query_details,
+    exabeam_analytics_syntax_details,
 )
 from app.translator.platforms.base.lucene.str_value_manager import lucene_str_value_manager
-from app.translator.platforms.exabeam.escape_manager import ExabeamEscapeManager
+from app.translator.platforms.exabeam.escape_manager import ExabeamAnalyticsEscapeManager, ExabeamEscapeManager
 from app.translator.platforms.exabeam.mapping import ExabeamMappings
-
+from app.translator.platforms.exabeam.str_value_manager import exabeam_analytics_str_value_manager
+from app.translator.core.custom_types.tokens import LogicalOperatorType
 
 class ExabeamEQLFieldValueRender(BaseFieldValueRender):
     details: PlatformDetails = exabeam_eql_query_details
@@ -151,7 +153,6 @@ class ExabeamEQLFieldValueRender(BaseFieldValueRender):
     def keywords_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
         return self.contains_modifier(field, value)
 
-
 @render_manager.register
 class ExabeamEQLQueryRender(PlatformQueryRender):
     details: PlatformDetails = exabeam_eql_query_details
@@ -209,6 +210,85 @@ class ExabeamEQLQueryRender(PlatformQueryRender):
             
         return result_query
 
+class ExabeamAnalyticsFieldValueRender(BaseFieldValueRender):
+    details: PlatformDetails = exabeam_analytics_syntax_details
+    escape_manager = ExabeamAnalyticsEscapeManager()
+    str_value_manager = exabeam_analytics_str_value_manager
+
+    @staticmethod
+    def _wrap_str_value(value: str) -> str:
+        """Wrap string values in quotes for Analytics Syntax"""
+        return f"'{value}'"
+
+    def equal_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
+        if isinstance(value, list):
+            values = self.or_token.join(f"{field} = {self._pre_process_value(field, val, wrap_str=True)}" for val in value)
+            return f"({values})"
+        return f"{field} = {self._pre_process_value(field, value, wrap_str=True)}"
+
+    def not_equal_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
+        if isinstance(value, list):
+            # Use De Morgan's law: NOT (A OR B) = NOT A AND NOT B
+            values = self.and_token.join(f"{field} != {self._pre_process_value(field, val, wrap_str=True)}" for val in value)
+            return f"({values})"
+        return f"{field} != {self._pre_process_value(field, value, wrap_str=True)}"
+    
+    def less_modifier(self, field: str, value: Union[int, str, StrValue]) -> str:
+        return f"{field} < {self._pre_process_value(field, value, wrap_str=True)}"
+
+    def less_or_equal_modifier(self, field: str, value: Union[int, str, StrValue]) -> str:
+        return f"{field} <= {self._pre_process_value(field, value, wrap_str=True)}"
+
+    def greater_modifier(self, field: str, value: Union[int, str, StrValue]) -> str:
+        return f"{field} > {self._pre_process_value(field, value, wrap_str=True)}"
+
+    def greater_or_equal_modifier(self, field: str, value: Union[int, str, StrValue]) -> str:
+        return f"{field} >= {self._pre_process_value(field, value, wrap_str=True)}"
+
+    def contains_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
+        if isinstance(value, list):
+            values = ", ".join(f"{self._pre_process_value(field, val, wrap_str=True)}" for val in self._pre_process_values_list(field, value))
+            return f"containsAny({field}, {values})"
+        return f"contains({field}, {self._pre_process_value(field, value, wrap_str=True)})"
+
+    def not_contains_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
+        if isinstance(value, list):
+            values = ", ".join(f"{self._pre_process_value(field, val, wrap_str=True)}" for val in self._pre_process_values_list(field, value))
+            return f"not(containsAny({field}, {values}))"
+        return f"not(contains({field}, {self._pre_process_value(field, value, wrap_str=True)}))"
+
+    def endswith_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
+        if isinstance(value, list):
+            values = ", ".join(f"{self._pre_process_value(field, val, wrap_str=True)}" for val in self._pre_process_values_list(field, value))
+            return f"endsWithAny({field}, {values})"
+        return f"endsWith({field}, {self._pre_process_value(field, value, wrap_str=True)})"
+
+    def not_endswith_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
+        if isinstance(value, list):
+            values = ", ".join(f"{self._pre_process_value(field, val, wrap_str=True)}" for val in self._pre_process_values_list(field, value))
+            return f"not(endsWithAny({field}, {values}))"
+        return f"not(endsWith({field}, {self._pre_process_value(field, value, wrap_str=True)}))"
+
+    def startswith_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
+        if isinstance(value, list):
+            values = ", ".join(f"{self._pre_process_value(field, val, wrap_str=True)}" for val in self._pre_process_values_list(field, value))
+            return f"startsWithAny({field}, {values})"
+        return f"startsWith({field}, {self._pre_process_value(field, value, wrap_str=True)})"
+
+    def not_startswith_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
+        if isinstance(value, list):
+            values = ", ".join(f"{self._pre_process_value(field, val, wrap_str=True)}" for val in self._pre_process_values_list(field, value))
+            return f"not(startsWithAny({field}, {values}))"
+        return f"not(startsWith({field}, {self._pre_process_value(field, value, wrap_str=True)}))"
+
+    def is_none(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
+        return f"{field} = null"
+
+    def is_not_none(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
+        return f"{field} != null"
+
+    def keywords_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
+        return self.contains_modifier(field, value)
 
 @render_manager.register  
 class ExabeamAnalyticsRuleRender(PlatformQueryRender):
@@ -221,7 +301,15 @@ class ExabeamAnalyticsRuleRender(PlatformQueryRender):
     and_token = "&&" 
     not_token = "!"
 
-    field_value_render = ExabeamEQLFieldValueRender(or_token=or_token)
+    def __init__(self):
+        super().__init__()
+        self.logical_operators_map = {
+            LogicalOperatorType.AND: f" {self.and_token} ",
+            LogicalOperatorType.OR: f" {self.or_token} ",
+            LogicalOperatorType.NOT: f"{self.not_token}",
+        }
+
+    field_value_render = ExabeamAnalyticsFieldValueRender(or_token=or_token)
     comment_symbol = "//"
 
     def generate_prefix(self, log_source_signature: dict, functions_prefix: str = "") -> str:
@@ -444,7 +532,6 @@ class ExabeamAnalyticsRuleRender(PlatformQueryRender):
             print(f"Error loading MITRE data: {e}")
         
         return None
-
 
 @render_manager.register
 class ExabeamCorrelationRuleRender(PlatformQueryRender):

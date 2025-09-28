@@ -15,7 +15,7 @@ field_mapping:
   ParentCommandLine: parent_process_command_line
   ProcessId: process_id
   ParentProcessId: parent_process_id
-  OriginalFileName: process_original_file_name
+  OriginalFileName: process_name
   User: user
   Computer: src_host
   EventID: event_id

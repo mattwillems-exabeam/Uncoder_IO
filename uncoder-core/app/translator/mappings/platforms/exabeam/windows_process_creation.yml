@@ -29,7 +29,7 @@ field_mapping:
   LogonId: logon_id
   LogonGuid: logon_guid
   TerminalSessionId: terminal_session_id
-  OriginalFileName: process_original_file_name
+  OriginalFileName: process_name
   Company: process_company
   Product: process_product
   Description: process_description

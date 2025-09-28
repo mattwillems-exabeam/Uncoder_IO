@@ -22,6 +22,7 @@ from app.translator.core.models.platform_details import PlatformDetails
 
 PLATFORM_DETAILS = {"group_id": "exabeam", "group_name": "Exabeam New-Scale", "alt_platform_name": "Default"}
 
+_EXABEAM_ANALYTICS_SYNTAX_DETAILS = "exabeam-analytics-syntax"
 _EXABEAM_EQL_QUERY = "exabeam-eql-query"
 _EXABEAM_ANALYTICS_RULE = "exabeam-analytics-rule"
 _EXABEAM_CORRELATION_RULE = "exabeam-correlation-rule"
@@ -30,6 +31,13 @@ EXABEAM_QUERY_TYPES = {
     _EXABEAM_EQL_QUERY,
     _EXABEAM_ANALYTICS_RULE,
     _EXABEAM_CORRELATION_RULE,
+}
+
+EXABEAM_ANALYTICS_SYNTAX_DETAILS = {
+    "platform_id": _EXABEAM_ANALYTICS_SYNTAX_DETAILS,
+    "name": "Exabeam Analytics Syntax",
+    "platform_name": "Analytics Rule",
+    "file_extension": "txt"
 }
 
 EXABEAM_EQL_QUERY_DETAILS = {
@@ -56,6 +64,7 @@ EXABEAM_CORRELATION_RULE_DETAILS = {
     **PLATFORM_DETAILS,
 }
 
+exabeam_analytics_syntax_details = PlatformDetails(**EXABEAM_ANALYTICS_SYNTAX_DETAILS)
 exabeam_eql_query_details = PlatformDetails(**EXABEAM_EQL_QUERY_DETAILS)
 exabeam_analytics_rule_details = PlatformDetails(**EXABEAM_ANALYTICS_RULE_DETAILS)
 exabeam_correlation_rule_details = PlatformDetails(**EXABEAM_CORRELATION_RULE_DETAILS)
@@ -106,7 +115,7 @@ EXABEAM_CORRELATION_RULE_TEMPLATE = {
 
 DEFAULT_EXABEAM_CTI_MAPPING = {
     "DestinationIP": "dest_ip",
-    "SourceIP": "src_ip", 
+    "SourceIP": "src_ip",
     "HashSha512": "file_hash",
     "HashSha256": "file_hash",
     "HashMd5": "file_hash",
