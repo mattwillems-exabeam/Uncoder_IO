@@ -229,7 +229,7 @@ class ExabeamAnalyticsFieldValueRender(BaseFieldValueRender):
     def not_equal_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
         if isinstance(value, list):
             # Use De Morgan's law: NOT (A OR B) = NOT A AND NOT B
-            values = self.and_token.join(f"{field} != {self._pre_process_value(field, val, wrap_str=True)}" for val in value)
+            values = self.and_token.join(f"{field} != {val}" for val in self._pre_process_values_list(field, value))
             return f"({values})"
         return f"{field} != {self._pre_process_value(field, value, wrap_str=True)}"
     
@@ -247,37 +247,37 @@ class ExabeamAnalyticsFieldValueRender(BaseFieldValueRender):
 
     def contains_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
         if isinstance(value, list):
-            values = ", ".join(f"{self._pre_process_value(field, val, wrap_str=True)}" for val in self._pre_process_values_list(field, value))
+            values = ", ".join(f"{val}" for val in self._pre_process_values_list(field, value))
             return f"containsAny({field}, {values})"
         return f"contains({field}, {self._pre_process_value(field, value, wrap_str=True)})"
 
     def not_contains_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
         if isinstance(value, list):
-            values = ", ".join(f"{self._pre_process_value(field, val, wrap_str=True)}" for val in self._pre_process_values_list(field, value))
+            values = ", ".join(f"{val}" for val in self._pre_process_values_list(field, value))
             return f"not(containsAny({field}, {values}))"
         return f"not(contains({field}, {self._pre_process_value(field, value, wrap_str=True)}))"
 
     def endswith_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
         if isinstance(value, list):
-            values = ", ".join(f"{self._pre_process_value(field, val, wrap_str=True)}" for val in self._pre_process_values_list(field, value))
+            values = ", ".join(f"{val}" for val in self._pre_process_values_list(field, value))
             return f"endsWithAny({field}, {values})"
         return f"endsWith({field}, {self._pre_process_value(field, value, wrap_str=True)})"
 
     def not_endswith_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
         if isinstance(value, list):
-            values = ", ".join(f"{self._pre_process_value(field, val, wrap_str=True)}" for val in self._pre_process_values_list(field, value))
+            values = ", ".join(f"{val}" for val in self._pre_process_values_list(field, value))
             return f"not(endsWithAny({field}, {values}))"
         return f"not(endsWith({field}, {self._pre_process_value(field, value, wrap_str=True)}))"
 
     def startswith_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
         if isinstance(value, list):
-            values = ", ".join(f"{self._pre_process_value(field, val, wrap_str=True)}" for val in self._pre_process_values_list(field, value))
+            values = ", ".join(f"{val}" for val in self._pre_process_values_list(field, value))
             return f"startsWithAny({field}, {values})"
         return f"startsWith({field}, {self._pre_process_value(field, value, wrap_str=True)})"
 
     def not_startswith_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
         if isinstance(value, list):
-            values = ", ".join(f"{self._pre_process_value(field, val, wrap_str=True)}" for val in self._pre_process_values_list(field, value))
+            values = ", ".join(f"{val}" for val in self._pre_process_values_list(field, value))
             return f"not(startsWithAny({field}, {values}))"
         return f"not(startsWith({field}, {self._pre_process_value(field, value, wrap_str=True)}))"
 
