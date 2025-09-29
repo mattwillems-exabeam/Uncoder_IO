@@ -24,7 +24,7 @@ from app.translator.core.models.escape_details import EscapeDetails
 
 class ExabeamAnalyticsEscapeManager(EscapeManager):
     escape_map: ClassVar[dict[str, list[EscapeDetails]]] = {
-        ValueType.value: [EscapeDetails(pattern=r"\\", escape_symbols=r"\\\\"), EscapeDetails(pattern="'", escape_symbols="\\'")],
+        ValueType.value: [EscapeDetails(pattern=r"\\", escape_symbols=r"\\"), EscapeDetails(pattern="'", escape_symbols="\\'")],
         ValueType.regex_value: [],
         ValueType.number_value: [],
         ValueType.bool_value: [],
