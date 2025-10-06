@@ -1,0 +1,12 @@
+platform: LogRhythm AIE
+source: default
+
+default_log_source:
+  category: aie
+
+log_source:
+  category: aie
+
+field_mapping:
+  # SIGMA fields are mapped programmatically in mapping.py get_field_id()
+  # This file satisfies the mapping loader requirement

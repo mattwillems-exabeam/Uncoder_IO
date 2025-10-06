@@ -18,7 +18,21 @@ limitations under the License.
 """
 
 from app.translator.core.mapping import BasePlatformMappings, LogSourceSignature
-from app.translator.platforms.logrhythm_aie.const import UNMAPPED_FIELD_DEFAULT
+from app.translator.platforms.logrhythm_aie.const import UNMAPPED_FIELD_DEFAULT, logrhythm_aie_rule_details
+
+
+class LogRhythmAIELogSourceSignature(LogSourceSignature):
+    """Log source signature for LogRhythm AIE (placeholder - not actively used)"""
+
+    def __init__(self):
+        pass
+
+    def is_suitable(self, log_source_signature: dict) -> bool:
+        """All log sources are suitable for AIE rules"""
+        return True
+
+    def __str__(self) -> str:
+        return ""
 
 
 class LogRhythmAIEMappings(BasePlatformMappings):
@@ -29,12 +43,25 @@ class LogRhythmAIEMappings(BasePlatformMappings):
     FieldEnum (used in group_by_fields)!
     """
 
-    def __init__(self, platform_dir: str = None):
-        super().__init__(platform_dir)
+    def __init__(self, platform_dir: str = None, platform_details=None):
+        if platform_details is None:
+            platform_details = logrhythm_aie_rule_details
+        super().__init__(platform_dir, platform_details)
 
     # FieldFilterTypeEnum mappings (for msg_filters → field_filters)
     # These are the filter_type values used when building field_filters
     skip_load_default_mappings = True
+
+    def prepare_log_source_signature(self, mapping: dict) -> LogSourceSignature:
+        """Prepare log source signature from mapping"""
+        return LogRhythmAIELogSourceSignature()
+
+    def check_fields_mapping_existence(self, query_fields, function_fields_map, supported_functions, source_mapping):
+        """
+        Override field mapping check - all fields are handled programmatically via get_field_id().
+        Return empty list to suppress 'unmapped fields' comment.
+        """
+        return []
 
     def get_field_id(self, sigma_field: str) -> int:
         """Get LogRhythm FieldFilterTypeEnum ID for SIGMA field"""
@@ -161,4 +188,6 @@ class LogRhythmAIEMappings(BasePlatformMappings):
 
 
 # Create singleton instance
-logrhythm_aie_mappings = LogRhythmAIEMappings()
+logrhythm_aie_mappings = LogRhythmAIEMappings(
+    platform_dir="logrhythm_aie", platform_details=logrhythm_aie_rule_details
+)

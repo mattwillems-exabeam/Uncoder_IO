@@ -69,8 +69,7 @@ Uncoder IO can be run on-prem without a need for an internet connection, thus su
 - Chronicle Security Rule - `chronicle-yaral-rule`
 - Graylog Query - `graylog-lucene-query`
 - FortiSIEM Rule - `fortisiem-rule`
-- LogRhythm Axon Rule - `axon-ads-rule`
-- LogRhythm Axon Query - `axon-ads-query`
+- LogRhythm AI Engine Rule - `logrhythm-aie-rule`
 - Exabeam New-Scale EQL Query - `exabeam-eql-query`
 - Exabeam New-Scale Analytics Rule - `exabeam-analytics-rule`
 - Exabeam New-Scale Correlation Rule - `exabeam-correlation-rule`
@@ -107,7 +106,7 @@ The following types of IOCs are supported:
 - IP   
 
 TODO list of languages we will support shortly:
-- ~LogRhythm Axon~ :white_check_mark:  
+- ~LogRhythm~ :white_check_mark:
 - ~Graylog~ :white_check_mark:
 - Devo
 - LimaCharlie

@@ -69,8 +69,10 @@ Uncoder IO може працювати локально без потреби в
 - Chronicle Security Rule - `chronicle-yaral-rule`
 - Graylog Query - `graylog-lucene-query`
 - FortiSIEM Rule - `fortisiem-rule`
-- LogRhythm Axon Rule - `axon-ads-rule`
-- LogRhythm Axon Query - `axon-ads-query`
+- LogRhythm AI Engine Rule - `logrhythm-aie-rule`
+- Exabeam New-Scale EQL Query - `exabeam-eql-query`
+- Exabeam New-Scale Analytics Rule - `exabeam-analytics-rule`
+- Exabeam New-Scale Correlation Rule - `exabeam-correlation-rule`
 
 Запити на основі індикаторів компрометації можна генерувати в таких форматах:
 - Microsoft Sentinel Query - `sentinel-kql-query`
@@ -102,7 +104,7 @@ Uncoder IO може працювати локально без потреби в
 - IP-адреси   
 
 Найближчим часом планується підтримка таких форматів:
-- ~LogRhythm Axon~ :white_check_mark: 
+- ~LogRhythm~ :white_check_mark:
 - ~~Graylog~~ :white_check_mark:
 - Devo
 - LimaCharlie
