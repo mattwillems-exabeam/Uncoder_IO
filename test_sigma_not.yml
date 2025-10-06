@@ -1,0 +1,23 @@
+title: Logon Not from Expected Host
+id: test-not-001
+status: test
+description: Detects logon events that did not originate from expected workstation
+author: Test Author
+date: 2024/01/01
+level: high
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 4624
+        LogonType: 3
+    filter:
+        WorkstationName: 'ADMIN-PC'
+    condition: selection and not filter
+falsepositives:
+    - User traveling with laptop
+    - Remote work from home
+tags:
+    - attack.lateral_movement
+    - attack.t1021

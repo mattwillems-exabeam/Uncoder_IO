@@ -66,34 +66,28 @@ class LogRhythmAIERuleRender(QueryRender):
         # Initialize platform functions for the base class
         self.init_platform_functions()
 
-    def _get_match_type(self, operator: str) -> int:
-        """Map SIGMA operator to LogRhythm MatchTypeEnum"""
-        if operator in [OperatorType.CONTAINS, OperatorType.NOT_CONTAINS]:
-            return MATCH_TYPE["Regex"]
-        elif operator in [OperatorType.STARTSWITH, OperatorType.NOT_STARTSWITH]:
-            return MATCH_TYPE["Regex"]
-        elif operator in [OperatorType.ENDSWITH, OperatorType.NOT_ENDSWITH]:
-            return MATCH_TYPE["Regex"]
-        elif operator in [OperatorType.REGEX, OperatorType.NOT_REGEX]:
-            return MATCH_TYPE["Regex"]
-        else:
-            # EQ, NOT_EQ, etc. - exact match
-            return MATCH_TYPE["Value"]
+    def _get_operator(self, operator: str) -> int:
+        """
+        Map SIGMA operator to LogRhythm operator enum.
 
-    def _build_regex_pattern(self, operator: str, value: str) -> str:
-        """Build regex pattern based on operator"""
-        escaped_value = self.escape_manager.escape_regex_chars(value)
-
-        if operator in [OperatorType.CONTAINS, OperatorType.NOT_CONTAINS]:
-            return escaped_value
+        LogRhythm operators:
+        0 = EqualTo, 1 = NotEqualTo, 2 = Contains, 3 = NotContains,
+        4 = BeginsWith, 5 = EndsWith
+        """
+        if operator in [OperatorType.EQ]:
+            return 0  # EqualTo
+        elif operator in [OperatorType.NOT_EQ]:
+            return 1  # NotEqualTo
+        elif operator in [OperatorType.CONTAINS, OperatorType.NOT_CONTAINS]:
+            return 2  # Contains
         elif operator in [OperatorType.STARTSWITH, OperatorType.NOT_STARTSWITH]:
-            return f"^{escaped_value}"
+            return 4  # BeginsWith
         elif operator in [OperatorType.ENDSWITH, OperatorType.NOT_ENDSWITH]:
-            return f"{escaped_value}$"
+            return 5  # EndsWith
         elif operator in [OperatorType.REGEX, OperatorType.NOT_REGEX]:
-            return value  # Already regex, don't escape
+            return 2  # Contains (treat regex as contains)
         else:
-            return value  # Exact match
+            return 0  # Default to EqualTo
 
     def _is_negated_operator(self, operator: str) -> bool:
         """Check if operator is negated (NOT_*)"""
@@ -114,6 +108,14 @@ class LogRhythmAIERuleRender(QueryRender):
         Convert a FieldValue token to one or more LogRhythm field_filters.
 
         Returns list of filters because one SIGMA field may map to multiple LogRhythm fields.
+
+        Output format matches AirxInterop.exe expectations:
+        {
+            "filter_type": int,      // FieldFilterTypeEnum ID
+            "operator": int,         // 0=EqualTo, 2=Contains, 4=BeginsWith, 5=EndsWith
+            "filter_mode": int,      // 0=IS NOT, 1=IS (default)
+            "values": [...]          // Array of string/int values
+        }
         """
         # Get the SIGMA field name
         sigma_field_name = token.field.source_name if hasattr(token.field, 'source_name') else str(token.field)
@@ -121,31 +123,26 @@ class LogRhythmAIERuleRender(QueryRender):
         # Map SIGMA field to LogRhythm FieldFilterTypeEnum ID
         field_id = self.mappings.get_field_id(sigma_field_name)
 
-        filters = []
+        # Get operator enum value
+        operator = self._get_operator(token.operator.token_type)
 
-        # Handle list values (OR logic within field)
+        # Determine filter_mode (0 = IS NOT, 1 = IS)
+        # Negated operators set filter_mode to 0
+        filter_mode = 0 if self._is_negated_operator(token.operator.token_type) else 1
+
+        # Handle list values - all go in single filter's values array
         values = token.value if isinstance(token.value, list) else [token.value]
 
-        for value in values:
-            # Determine match type and build pattern
-            match_type = self._get_match_type(token.operator.token_type)
+        # Convert values to strings (except for numeric fields)
+        converted_values = [str(v) for v in values]
 
-            if match_type == MATCH_TYPE["Regex"]:
-                pattern = self._build_regex_pattern(token.operator.token_type, str(value))
-            else:
-                pattern = str(value)
-
-            # Determine filter_mode (0 = normal, 1 = negated)
-            filter_mode = 1 if self._is_negated_operator(token.operator.token_type) else 0
-
-            filters.append({
-                "filter_type": field_id,
-                "filter_mode": filter_mode,
-                "filter_value": pattern,
-                "match_type": match_type
-            })
-
-        return filters
+        # Return single filter with all values
+        return [{
+            "filter_type": field_id,
+            "operator": operator,
+            "filter_mode": filter_mode,
+            "values": converted_values
+        }]
 
     def _determine_field_operator(
         self,
@@ -189,11 +186,13 @@ class LogRhythmAIERuleRender(QueryRender):
         self,
         tokens: list,
         source_mapping: SourceMapping
-    ) -> dict:
+    ) -> list[dict]:
         """
         Convert SIGMA tokens to LogRhythm msg_filters structure.
 
         Handles field_operator logic for AND/OR combinations.
+
+        Returns list of msg_filter objects, each with msg_filter_type and field_filters.
         """
         field_filters = []
         prev_was_or = False
@@ -216,9 +215,11 @@ class LogRhythmAIERuleRender(QueryRender):
             elif hasattr(token, 'token_type') and token.token_type == LogicalOperatorType.AND:
                 prev_was_or = False
 
-        return {
+        # Wrap field_filters in msg_filter structure
+        return [{
+            "msg_filter_type": 1,
             "field_filters": field_filters
-        }
+        }]
 
     def _detect_aggregation(self, meta_info: MetaInfoContainer) -> Optional[str]:
         """
