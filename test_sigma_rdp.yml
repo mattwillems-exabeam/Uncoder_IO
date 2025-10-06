@@ -1,0 +1,20 @@
+title: Suspicious RDP Login
+id: 1234-5678-90ab-cdef
+status: test
+description: Detects suspicious RDP connections
+author: Test Author
+date: 2024/01/01
+level: high
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 4624
+        LogonType: 10
+    condition: selection
+falsepositives:
+    - Legitimate remote administration
+tags:
+    - attack.lateral_movement
+    - attack.t1021.001
