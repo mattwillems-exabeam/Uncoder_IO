@@ -544,7 +544,7 @@ class ExabeamCorrelationRuleRender(PlatformQueryRender):
     and_token = "AND"
     not_token = "NOT"
 
-    field_value_render = ExabeamEQLFieldValueRender(or_token=or_token)
+    field_value_render = ExabeamAnalyticsFieldValueRender(or_token="OR")
     comment_symbol = "//"
 
     def generate_prefix(self, log_source_signature: dict, functions_prefix: str = "") -> str:
