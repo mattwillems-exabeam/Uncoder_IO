@@ -47,6 +47,9 @@ class ExabeamLogSourceSignature(LogSourceSignature):
 
 
 class ExabeamMappings(BasePlatformMappings):
+    # Load default.yml fields into the default mapping (don't skip it)
+    skip_load_default_mappings = False
+
     def prepare_log_source_signature(self, mapping: dict) -> ExabeamLogSourceSignature:
         default_source = mapping.get("default_log_source", {})
         log_sources = mapping.get("log_source", {})
