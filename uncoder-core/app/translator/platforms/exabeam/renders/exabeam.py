@@ -287,6 +287,18 @@ class ExabeamAnalyticsFieldValueRender(BaseFieldValueRender):
     def is_not_none(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
         return f"{field} != null"
 
+    def regex_modifier(self, field: str, value: Union[int, str, StrValue]) -> str:
+        """Analytics syntax uses contains() with regex patterns, not RGX()"""
+        # For regex patterns in Analytics syntax, use contains() with the pattern
+        # Exabeam Analytics doesn't have a direct regex function like EQL's RGX()
+        processed_value = self._pre_process_value(field, value, wrap_str=True)
+        return f"contains({field}, {processed_value})"
+
+    def not_regex_modifier(self, field: str, value: Union[int, str, StrValue]) -> str:
+        """Analytics syntax negation of regex"""
+        processed_value = self._pre_process_value(field, value, wrap_str=True)
+        return f"not(contains({field}, {processed_value}))"
+
     def keywords_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
         return self.contains_modifier(field, value)
 
