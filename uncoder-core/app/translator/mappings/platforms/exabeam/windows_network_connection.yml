@@ -21,10 +21,15 @@ field_mapping:
   RemoteAddress: dest_ip
   RemotePort: dest_port
   Protocol: protocol
-  Initiated: network_initiated
   Image: process_path
   User: user
   ProcessId: process_id
+  ShareName: share_name
+  BytesSent: bytes_out
+  BytesReceived: bytes_in
+  DestinationHostname: dest_host
+  SourceHostname: src_host
+  SourceImage: process_path
   
   # Network connection fields
   source.ip: src_ip
@@ -41,7 +46,7 @@ field_mapping:
   
   # User context
   user.name: user
-  user.domain: user_domain
+  user.domain: domain
   
   # Host context
   host.name: src_host
@@ -49,5 +54,6 @@ field_mapping:
   
   # Event context
   winlog.event_id: event_id
-  "@timestamp": timestamp
-  time: timestamp
+  "@timestamp": time
+  time: time
+  EventType: activity_type

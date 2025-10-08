@@ -11,14 +11,15 @@ default_log_source:
 field_mapping:
   # Registry fields
   TargetObject: registry_path
-  Details: registry_value_data
+  Details: registry_details
+  Data: registry_details
   RegistryKey: registry_key
-  RegistryValue: registry_value_name
+  RegistryValue: registry_value
   registry.key: registry_key
-  registry.value: registry_value_name
-  registry.data: registry_value_data
+  registry.value: registry_value
+  registry.data: registry_details
   registry.path: registry_path
-  EventType: registry_event_type
+  EventType: activity_type
 
   # Process context
   Image: process_path
@@ -27,6 +28,9 @@ field_mapping:
   process.name: process_name
   process.pid: process_id
   process.executable: process_path
+  SourceImage: process_path
+  TargetImage: process_path
+  IntegrityLevel: process_integrity
 
   # Host context
   Computer: src_host

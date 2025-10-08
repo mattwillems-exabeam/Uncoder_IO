@@ -18,28 +18,20 @@ field_mapping:
   ParentCommandLine: parent_process_command_line
   ProcessId: process_id
   ParentProcessId: parent_process_id
-  ProcessGuid: process_guid
-  ParentProcessGuid: parent_process_guid
-  UtcTime: timestamp
-  CreationUtcTime: timestamp
   User: user
-  ParentUser: parent_process_user
-  IntegrityLevel: process_integrity_level
-  CurrentDirectory: process_working_directory
-  LogonId: logon_id
-  LogonGuid: logon_guid
-  TerminalSessionId: terminal_session_id
   OriginalFileName: process_name
-  Company: process_company
-  Product: process_product
-  Description: process_description
-  FileVersion: process_file_version
-  Hashes: process_hash
-  md5: process_hash
-  sha1: process_hash
-  sha256: process_hash
-  IMPHASH: process_imphash
-  RuleName: rule_name
+  ProcessName: process_name
+  IntegrityLevel: process_integrity
+  LogonId: session_id
+  Description: description
+  ImagePath: process_path
+  SourceImage: process_path
+  TargetImage: process_path
+  ImageLoaded: file_path
+  md5: hash_md5
+  sha256: hash_sha256
+  Provider_Name: log_source
+  TaskName: task_name
   
   # File and registry fields
   TargetFilename: file_path

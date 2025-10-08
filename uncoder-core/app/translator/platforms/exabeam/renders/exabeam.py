@@ -358,13 +358,19 @@ class ExabeamAnalyticsRuleRender(PlatformQueryRender):
         
         # Set EQL condition
         rule_def["actOnCondition"] = query
-        
-        # Map activity types from meta_info logsource
+
+        # Map activity types from meta_info parsed_logsources
         activity_type = "process-create"  # Default
-        if meta_info and hasattr(meta_info, 'logsource') and meta_info.logsource:
-            if hasattr(meta_info.logsource, 'category') and meta_info.logsource.category:
-                activity_type = self._map_category_to_activity(meta_info.logsource.category)
-        
+        if meta_info and hasattr(meta_info, 'parsed_logsources') and meta_info.parsed_logsources:
+            parsed_logsources = meta_info.parsed_logsources
+            category = parsed_logsources.get('category', [''])[0] if 'category' in parsed_logsources else ''
+            service = parsed_logsources.get('service', [''])[0] if 'service' in parsed_logsources else ''
+
+            if category:
+                activity_type = self._map_category_to_activity(category)
+            elif service:
+                activity_type = self._map_service_to_activity(service)
+
         rule_def["applicableEvents"] = [{"activity_type": activity_type}]
         
         # Map severity
@@ -458,10 +464,23 @@ class ExabeamAnalyticsRuleRender(PlatformQueryRender):
         }
         return category_mapping.get(category, "process-create")
 
+    def _map_service_to_activity(self, service: str) -> str:
+        """Map SIGMA logsource service to Exabeam activity type"""
+        service_mapping = {
+            "cloudtrail": "cloudtrail-event",
+            "azure": "azure-activity",
+            "azuread": "azure-ad-activity",
+            "okta": "okta-activity",
+            "google_workspace": "google-workspace-activity",
+            "m365": "microsoft-365-activity",
+            "o365": "microsoft-365-activity",
+        }
+        return service_mapping.get(service, "process-create")
+
     def _infer_use_cases(self, query: str, meta_info) -> list:
         query_lower = query.lower()
         use_cases = []
-        
+
         if any(term in query_lower for term in ["password", "credential", "auth", "login"]):
             use_cases.append("Compromised Credentials")
         if any(term in query_lower for term in ["privilege", "admin", "elevated", "system"]):
@@ -487,7 +506,13 @@ class ExabeamAnalyticsRuleRender(PlatformQueryRender):
                 "logon": "auth-activity",
                 "firewall-activity": "network-activity",
                 "dns-query": "dns-activity",
-                "endpoint-login": "endpoint-login-activity"
+                "endpoint-login": "endpoint-login-activity",
+                "cloudtrail-event": "cloud-activity",
+                "azure-activity": "cloud-activity",
+                "azure-ad-activity": "cloud-activity",
+                "okta-activity": "cloud-activity",
+                "google-workspace-activity": "cloud-activity",
+                "microsoft-365-activity": "cloud-activity",
             }
             return family_mapping.get(activity, "General Activity")
         
@@ -616,7 +641,21 @@ class ExabeamCorrelationRuleRender(PlatformQueryRender):
         # Set use case (single string, not array)
         use_cases = self._infer_use_cases(query, meta_info)
         rule_def["useCase"] = use_cases[0].lower() if use_cases else "malware"
-        
+
+        # Map activity types from meta_info parsed_logsources
+        activity_type = "process-create"  # Default
+        if meta_info and hasattr(meta_info, 'parsed_logsources') and meta_info.parsed_logsources:
+            parsed_logsources = meta_info.parsed_logsources
+            category = parsed_logsources.get('category', [''])[0] if 'category' in parsed_logsources else ''
+            service = parsed_logsources.get('service', [''])[0] if 'service' in parsed_logsources else ''
+
+            if category:
+                activity_type = self._map_category_to_activity(category)
+            elif service:
+                activity_type = self._map_service_to_activity(service)
+
+        rule_def["applicableEvents"] = [{"activity_type": activity_type}]
+
         # Set sequence details
         sequence["query"] = query
         sequence["id"] = str(uuid.uuid4())
@@ -677,6 +716,19 @@ class ExabeamCorrelationRuleRender(PlatformQueryRender):
             "dns": "dns-query",
         }
         return category_mapping.get(category, "process-create")
+
+    def _map_service_to_activity(self, service: str) -> str:
+        """Map SIGMA logsource service to Exabeam activity type"""
+        service_mapping = {
+            "cloudtrail": "cloudtrail-event",
+            "azure": "azure-activity",
+            "azuread": "azure-ad-activity",
+            "okta": "okta-activity",
+            "google_workspace": "google-workspace-activity",
+            "m365": "microsoft-365-activity",
+            "o365": "microsoft-365-activity",
+        }
+        return service_mapping.get(service, "process-create")
 
     def _infer_use_cases(self, query: str, meta_info) -> list:
         query_lower = query.lower()
