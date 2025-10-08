@@ -1,0 +1,40 @@
+platform: Exabeam
+source: windows_registry_event
+
+log_source:
+  category: registry_event
+  activity_type: registry-write
+
+default_log_source:
+  activity_type: registry-write
+
+field_mapping:
+  # Registry fields
+  TargetObject: registry_path
+  Details: registry_value_data
+  RegistryKey: registry_key
+  RegistryValue: registry_value_name
+  registry.key: registry_key
+  registry.value: registry_value_name
+  registry.data: registry_value_data
+  registry.path: registry_path
+  EventType: registry_event_type
+
+  # Process context
+  Image: process_path
+  ProcessId: process_id
+  User: user
+  process.name: process_name
+  process.pid: process_id
+  process.executable: process_path
+
+  # Host context
+  Computer: src_host
+  ComputerName: src_host
+  host.name: src_host
+
+  # Event metadata
+  EventID: event_id
+  event_id: event_id
+  winlog.event_id: event_id
+  UtcTime: timestamp

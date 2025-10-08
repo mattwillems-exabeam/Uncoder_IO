@@ -1,0 +1,49 @@
+platform: Exabeam
+source: windows_file_event
+
+log_source:
+  category: file_event
+  activity_type: file-write
+
+default_log_source:
+  activity_type: file-write
+
+field_mapping:
+  # File event fields
+  TargetFilename: file_path
+  TargetFileName: file_path
+  FileName: file_name
+  FilePath: file_path
+  file.path: file_path
+  file.name: file_name
+  file.directory: file_directory
+
+  # File hash fields
+  Hashes: file_hash
+  md5: file_hash
+  sha1: file_hash
+  sha256: file_hash
+  sha512: file_hash
+  file.hash.md5: file_hash
+  file.hash.sha1: file_hash
+  file.hash.sha256: file_hash
+
+  # Process context
+  Image: process_path
+  ProcessId: process_id
+  User: user
+  process.name: process_name
+  process.pid: process_id
+  process.executable: process_path
+
+  # Host context
+  Computer: src_host
+  ComputerName: src_host
+  host.name: src_host
+
+  # Event metadata
+  EventID: event_id
+  event_id: event_id
+  winlog.event_id: event_id
+  UtcTime: timestamp
+  CreationUtcTime: timestamp

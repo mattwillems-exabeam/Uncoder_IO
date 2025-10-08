@@ -116,3 +116,137 @@ field_mapping:
   service.name: service_name
   winlog.channel: log_name
   winlog.event_id: event_id
+
+  # DNS fields
+  query: dns_query
+  QueryName: dns_query
+  QueryResults: dns_response
+  QueryStatus: dns_response_code
+  answer: dns_response
+  record_type: dns_record_type
+  parent_domain: dns_parent_domain
+
+  # Authentication/Logon fields
+  LogonType: logon_type
+  LogonId: logon_id
+  LogonGuid: logon_guid
+  AuthenticationPackageName: auth_package
+  TargetLogonId: target_logon_id
+  TargetDomainName: dest_user_domain
+  SubjectDomainName: user_domain
+  FailureReason: failure_reason
+  Status: status
+  SubStatus: sub_status
+
+  # Advanced process fields (Sysmon)
+  IntegrityLevel: process_integrity_level
+  CurrentDirectory: process_working_directory
+  TerminalSessionId: terminal_session_id
+  ProcessGuid: process_guid
+  ParentProcessGuid: parent_process_guid
+  UtcTime: timestamp
+  CreationUtcTime: timestamp
+  ParentUser: parent_process_user
+
+  # Code signing fields
+  Signed: process_signed
+  Signature: process_signature
+  SignatureStatus: process_signature_status
+
+  # File hash fields
+  Hashes: file_hash
+  md5: file_hash
+  sha1: file_hash
+  sha256: file_hash
+  sha512: file_hash
+  IMPHASH: process_imphash
+  Imphash: process_imphash
+
+  # Web/HTTP/URL fields
+  URL: url
+  url: url
+  cs-uri-query: url_query
+  cs-uri-stem: url_path
+  cs-method: http_method
+  c-useragent: user_agent
+  UserAgent: user_agent
+  User-Agent: user_agent
+  cs-host: dest_host
+  cs-referrer: http_referrer
+  sc-status: http_status
+
+  # Cloud/AWS fields
+  eventName: event_name
+  eventSource: event_source
+  awsRegion: cloud_region
+  userIdentity.type: user_type
+  userIdentity.principalId: principal_id
+  userIdentity.arn: user_arn
+  userIdentity.accountId: account_id
+  userIdentity.userName: user
+  sourceIPAddress: src_ip
+  userAgent: user_agent
+  requestParameters: request_parameters
+  responseElements: response_elements
+
+  # Azure fields
+  operationName: event_name
+  resourceId: resource_id
+  resourceType: resource_type
+  subscriptionId: subscription_id
+  tenantId: tenant_id
+  caller: user
+
+  # GCP fields
+  protoPayload.methodName: event_name
+  protoPayload.authenticationInfo.principalEmail: user
+  protoPayload.resourceName: resource_name
+  protoPayload.serviceName: service_name
+
+  # Additional network fields
+  Protocol: protocol
+  DestinationHostname: dest_host
+  SourceHostname: src_host
+  Direction: direction
+  BytesSent: bytes_sent
+  BytesReceived: bytes_received
+
+  # Email fields
+  Sender: sender
+  Recipient: recipient
+  Subject: email_subject
+
+  # Object/Resource access fields
+  ObjectType: object_type
+  ObjectName: object_name
+  ObjectServer: object_server
+  AccessMask: access_mask
+  HandleId: handle_id
+
+  # Advanced threat fields
+  GrantedAccess: granted_access
+  CallTrace: call_trace
+  SourceImage: source_process_path
+  TargetImage: target_process_path
+
+  # Windows event log fields
+  Channel: log_name
+  Provider_Name: provider_name
+  EventRecordID: event_record_id
+  Level: severity
+  Task: task
+  Keywords: keywords
+
+  # Application-specific fields
+  Application: process_path
+  FilterOrigin: filter_origin
+  Initiated: initiated
+  RuleName: rule_name
+
+  # Host/Device fields
+  Hostname: src_host
+  HostName: src_host
+  ComputerName: src_host
+  host.name: src_host
+  host.hostname: src_host
+  host.id: host_id

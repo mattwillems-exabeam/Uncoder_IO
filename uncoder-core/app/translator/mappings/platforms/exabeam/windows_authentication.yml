@@ -1,0 +1,48 @@
+platform: Exabeam
+source: windows_authentication
+
+log_source:
+  category: authentication
+  activity_type: logon
+
+default_log_source:
+  activity_type: logon
+
+field_mapping:
+  # Authentication fields
+  SubjectUserName: user
+  TargetUserName: dest_user
+  LogonType: logon_type
+  LogonId: logon_id
+  LogonGuid: logon_guid
+  WorkstationName: src_host
+  IpAddress: src_ip
+  SourceAddress: src_ip
+  TargetLogonId: target_logon_id
+  TargetDomainName: dest_user_domain
+  SubjectDomainName: user_domain
+  AuthenticationPackageName: auth_package
+  FailureReason: failure_reason
+  Status: status
+  SubStatus: sub_status
+
+  # Network context
+  SourceIp: src_ip
+  src_ip: src_ip
+  source.ip: src_ip
+
+  # User context
+  User: user
+  user.name: user
+  user.domain: user_domain
+  target.user.name: dest_user
+
+  # Host context
+  Computer: dest_host
+  ComputerName: dest_host
+  host.name: dest_host
+
+  # Event metadata
+  EventID: event_id
+  event_id: event_id
+  winlog.event_id: event_id

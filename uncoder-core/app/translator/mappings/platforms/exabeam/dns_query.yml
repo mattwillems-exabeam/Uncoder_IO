@@ -1,0 +1,40 @@
+platform: Exabeam
+source: dns_query
+
+log_source:
+  category: dns
+  activity_type: dns-query
+
+default_log_source:
+  activity_type: dns-query
+
+field_mapping:
+  # DNS-specific fields
+  query: dns_query
+  QueryName: dns_query
+  QueryResults: dns_response
+  QueryStatus: dns_response_code
+  answer: dns_response
+  record_type: dns_record_type
+  parent_domain: dns_parent_domain
+
+  # Network context
+  SourceIp: src_ip
+  DestinationIp: dest_ip
+  src_ip: src_ip
+  dest_ip: dest_ip
+
+  # Process context
+  Image: process_path
+  ProcessId: process_id
+  User: user
+
+  # Host context
+  Computer: src_host
+  ComputerName: src_host
+  host.name: src_host
+
+  # Event metadata
+  EventID: event_id
+  event_id: event_id
+  winlog.event_id: event_id

@@ -349,11 +349,12 @@ class ExabeamAnalyticsRuleRender(PlatformQueryRender):
     def _map_category_to_activity(self, category: str) -> str:
         category_mapping = {
             "process_creation": "process-create",
-            "network_connection": "network-connection", 
-            "file_event": "file-event",
-            "registry_event": "registry-event",
-            "authentication": "authentication",
+            "network_connection": "network-connection",
+            "file_event": "file-write",
+            "registry_event": "registry-write",
+            "authentication": "logon",
             "firewall": "firewall-activity",
+            "dns": "dns-query",
         }
         return category_mapping.get(category, "process-create")
 
@@ -380,10 +381,10 @@ class ExabeamAnalyticsRuleRender(PlatformQueryRender):
             # Map to valid Exabeam families from documentation
             family_mapping = {
                 "process-create": "process-creation-activity",
-                "network-connection": "network-activity", 
-                "file-event": "file-activity",
-                "registry-event": "registry-activity",
-                "authentication": "auth-activity",
+                "network-connection": "network-activity",
+                "file-write": "file-activity",
+                "registry-write": "registry-activity",
+                "logon": "auth-activity",
                 "firewall-activity": "network-activity",
                 "dns-query": "dns-activity",
                 "endpoint-login": "endpoint-login-activity"
@@ -570,10 +571,11 @@ class ExabeamCorrelationRuleRender(PlatformQueryRender):
         category_mapping = {
             "process_creation": "process-create",
             "network_connection": "network-connection",
-            "file_event": "file-event", 
-            "registry_event": "registry-event",
-            "authentication": "authentication",
+            "file_event": "file-write",
+            "registry_event": "registry-write",
+            "authentication": "logon",
             "firewall": "firewall-activity",
+            "dns": "dns-query",
         }
         return category_mapping.get(category, "process-create")
 
