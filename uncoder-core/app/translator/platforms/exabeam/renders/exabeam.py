@@ -298,8 +298,11 @@ class ExabeamAnalyticsRuleRender(PlatformQueryRender):
     )
 
     or_token = "||"
-    and_token = "&&" 
+    and_token = "&&"
     not_token = "!"
+
+    field_value_render = ExabeamAnalyticsFieldValueRender(or_token="||")
+    comment_symbol = "//"
 
     def __init__(self):
         super().__init__()
@@ -308,9 +311,6 @@ class ExabeamAnalyticsRuleRender(PlatformQueryRender):
             LogicalOperatorType.OR: f" {self.or_token} ",
             LogicalOperatorType.NOT: f"{self.not_token}",
         }
-
-    field_value_render = ExabeamAnalyticsFieldValueRender(or_token=or_token)
-    comment_symbol = "//"
 
     def generate_prefix(self, log_source_signature: dict, functions_prefix: str = "") -> str:
         return ""
