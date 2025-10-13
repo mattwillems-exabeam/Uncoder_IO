@@ -46,17 +46,23 @@ class ExabeamEQLFieldValueRender(BaseFieldValueRender):
     details: PlatformDetails = exabeam_eql_query_details
     escape_manager = ExabeamEscapeManager()
     str_value_manager = lucene_str_value_manager
-    
-    def _escape_regex_value(self, value: str) -> str:
+
+    def _escape_regex_value(self, value: Union[str, StrValue]) -> str:
         """Escape regex special characters for use in RGX() expressions"""
-        if isinstance(value, str):
+        # StrValue is a subclass of str, so we can treat it as a string directly
+        # The StrValue itself IS the original unescaped string value
+        if isinstance(value, StrValue):
+            # Convert to plain string - StrValue IS a str, just cast it
+            value = str(value)
+        elif isinstance(value, str):
             # Remove quotes if present
             value = value.strip('"\'')
-            # Only escape the essential regex metacharacters that need escaping
-            # Avoid double-escaping by handling backslashes first
-            value = value.replace('\\', '\\\\')  # Handle backslashes first
-            value = value.replace('.', '\\.')    # Escape dots
-            # Don't escape other regex chars as they might be intentional
+
+        # For regex patterns, escape special regex metacharacters to match them literally
+        # Escape backslashes first to avoid double-escaping, then escape dots
+        value = value.replace('\\', r'\\')  # One backslash becomes two for regex
+        value = value.replace('.', r'\.')   # Dot becomes \. for literal match
+
         return value
     
     @staticmethod
@@ -91,23 +97,23 @@ class ExabeamEQLFieldValueRender(BaseFieldValueRender):
 
     def contains_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
         if isinstance(value, list):
-            values = self.or_token.join(f"{field} = RGX(\".*{self._escape_regex_value(val)}.*\")" for val in self._pre_process_values_list(field, value))
+            values = self.or_token.join(f"{field} = RGX(\".*{self._escape_regex_value(val)}.*\")" for val in value)
             return f"({values})"
-        escaped_value = self._escape_regex_value(self._pre_process_value(field, value))
+        escaped_value = self._escape_regex_value(value)
         return f"{field} = RGX(\".*{escaped_value}.*\")"
 
     def endswith_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
         if isinstance(value, list):
-            values = self.or_token.join(f"{field} = RGX(\"{self._escape_regex_value(val)}$\")" for val in self._pre_process_values_list(field, value))
+            values = self.or_token.join(f"{field} = RGX(\"{self._escape_regex_value(val)}$\")" for val in value)
             return f"({values})"
-        escaped_value = self._escape_regex_value(self._pre_process_value(field, value))
+        escaped_value = self._escape_regex_value(value)
         return f"{field} = RGX(\"{escaped_value}$\")"
 
     def startswith_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
         if isinstance(value, list):
-            values = self.or_token.join(f"{field} = RGX(\"^{self._escape_regex_value(val)}\")" for val in self._pre_process_values_list(field, value))
+            values = self.or_token.join(f"{field} = RGX(\"^{self._escape_regex_value(val)}\")" for val in value)
             return f"({values})"
-        escaped_value = self._escape_regex_value(self._pre_process_value(field, value))
+        escaped_value = self._escape_regex_value(value)
         return f"{field} = RGX(\"^{escaped_value}\")"
 
     def regex_modifier(self, field: str, value: Union[int, str, StrValue]) -> str:
@@ -119,23 +125,23 @@ class ExabeamEQLFieldValueRender(BaseFieldValueRender):
 
     def not_contains_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
         if isinstance(value, list):
-            values = self.or_token.join(f"{field} != RGX(\".*{self._escape_regex_value(val)}.*\")" for val in self._pre_process_values_list(field, value))
+            values = self.or_token.join(f"{field} != RGX(\".*{self._escape_regex_value(val)}.*\")" for val in value)
             return f"({values})"
-        escaped_value = self._escape_regex_value(self._pre_process_value(field, value))
+        escaped_value = self._escape_regex_value(value)
         return f"{field} != RGX(\".*{escaped_value}.*\")"
 
     def not_endswith_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
         if isinstance(value, list):
-            values = self.or_token.join(f"{field} != RGX(\"{self._escape_regex_value(val)}$\")" for val in self._pre_process_values_list(field, value))
+            values = self.or_token.join(f"{field} != RGX(\"{self._escape_regex_value(val)}$\")" for val in value)
             return f"({values})"
-        escaped_value = self._escape_regex_value(self._pre_process_value(field, value))
+        escaped_value = self._escape_regex_value(value)
         return f"{field} != RGX(\"{escaped_value}$\")"
 
     def not_startswith_modifier(self, field: str, value: DEFAULT_VALUE_TYPE) -> str:
         if isinstance(value, list):
-            values = self.or_token.join(f"{field} != RGX(\"^{self._escape_regex_value(val)}\")" for val in self._pre_process_values_list(field, value))
+            values = self.or_token.join(f"{field} != RGX(\"^{self._escape_regex_value(val)}\")" for val in value)
             return f"({values})"
-        escaped_value = self._escape_regex_value(self._pre_process_value(field, value))
+        escaped_value = self._escape_regex_value(value)
         return f"{field} != RGX(\"^{escaped_value}\")"
 
     def not_regex_modifier(self, field: str, value: Union[int, str, StrValue]) -> str:
