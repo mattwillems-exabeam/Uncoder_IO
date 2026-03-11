@@ -18,7 +18,7 @@ field_mapping:
   OriginalFileName: process_name
   User: user
   Computer: src_host
-  EventID: event_id
+  EventID: event_code
 
   # Advanced process fields
   SourceImage: process_path
@@ -111,13 +111,13 @@ field_mapping:
   registry.data: registry_details
   
   # Event ID mapping
-  event.code: event_id
+  event.code: event_code
   event.action: activity
   
   # Service/System
   service.name: service_name
   winlog.channel: log_name
-  winlog.event_id: event_id
+  winlog.event_id: event_code
 
   # DNS fields
   query: dns_query

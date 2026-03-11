@@ -38,7 +38,7 @@ field_mapping:
   TargetObject: registry_path
   
   # System fields
-  EventID: event_id
+  EventID: event_code
   Computer: src_host
   SubjectUserName: user
   TargetUserName: dest_user

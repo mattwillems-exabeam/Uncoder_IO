@@ -43,6 +43,6 @@ field_mapping:
   host.name: dest_host
 
   # Event metadata
-  EventID: event_id
-  event_id: event_id
-  winlog.event_id: event_id
+  EventID: event_code
+  event_id: event_code
+  winlog.event_id: event_code
